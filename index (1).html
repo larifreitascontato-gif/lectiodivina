@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lectio Divina · Liturgia do Dia</title>
+<!-- Segurança -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://api.anthropic.com; img-src 'self' data:;">
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+<meta name="referrer" content="no-referrer"/>
+<!-- Performance: preconnect para fontes -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--cream:#F7F3EE;--parchment:#EDE7DC;--rose:#C97B7B;--rose-dark:#9E5A5A;--rose-light:#F2E4E4;--rose-pale:#FAF0F0;--gold:#B89A6A;--gold-light:#F5EDD8;--ink:#2C2420;--ink-mid:#6B5A52;--ink-soft:#A0907A;--sage:#7A9E8A;--sage-light:#E8F0EB;--lavender:#8A7AAE;--lavender-light:#EEE8F5;--amber:#B87A3A;--amber-light:#F5EAD8;--font-d:'Cormorant Garamond',Georgia,serif;--font-b:'Inter',system-ui,sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:var(--cream);color:var(--ink);font-family:var(--font-b);min-height:100vh;padding-bottom:4rem}
+
+.page-header{background:var(--ink);padding:2.5rem 1.5rem 2rem;text-align:center}
+.page-header-eyebrow{font-size:10px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:.75rem}
+.page-header h1{font-family:var(--font-d);font-size:clamp(2rem,8vw,3rem);font-weight:500;color:var(--cream);letter-spacing:.01em;line-height:1.1;margin-bottom:.5rem}
+.page-header h1 em{font-style:italic;color:var(--gold)}
+.page-header-sub{font-size:13px;color:var(--ink-soft);line-height:1.6}
+
+.date-bar{background:var(--ink);padding:1.5rem 1.5rem 1.25rem;text-align:center;border-bottom:none}
+.date-text{display:block}.date-wday{font-family:"Outfit",sans-serif;font-size:clamp(11px,3vw,13px);font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:.35rem}.date-num{font-family:"Outfit",sans-serif;font-size:clamp(2.8rem,10vw,4.5rem);font-weight:700;color:var(--cream);line-height:1;letter-spacing:-.01em}.date-month{font-family:"Outfit",sans-serif;font-size:clamp(12px,3.5vw,15px);font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);margin-top:.2rem}
+.feast-text{font-family:"Outfit",sans-serif;font-size:12px;color:var(--rose);font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin-top:.6rem}
+
+.streak-section{padding:1.25rem 1.5rem .5rem;background:var(--cream);border-bottom:1px solid var(--parchment)}
+.streak-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:480px;margin:0 auto 1.25rem}
+.streak-item{background:white;border:1px solid var(--parchment);border-radius:10px;padding:10px 8px;text-align:center}
+.streak-num{font-family:var(--font-d);font-size:22px;font-weight:600;color:var(--rose-dark);line-height:1;margin-bottom:3px}
+.streak-label{font-size:10px;color:var(--ink-soft);line-height:1.3}
+
+.cal-wrap{max-width:480px;margin:0 auto;padding-bottom:1.25rem}
+.cal-title{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:.75rem;text-align:center}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-dow{font-size:10px;color:var(--ink-soft);text-align:center;padding:2px 0 4px}
+.cal-day{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink-soft);background:var(--parchment)}
+.cal-day.done{background:var(--rose-dark);color:white;font-weight:700;box-shadow:0 2px 6px rgba(158,90,90,.35)}
+.cal-day.today{border:1.5px solid var(--rose);color:var(--ink);font-weight:500}
+.cal-day.today.done{background:var(--rose-dark);border-color:var(--rose-dark);color:white}
+
+.main{max-width:600px;margin:0 auto;padding:1.5rem 1.25rem 0}
+
+.tab-nav{display:flex;border-bottom:1px solid var(--parchment);margin-bottom:1.5rem}
+.tnav{flex:1;text-align:center;font-size:13px;padding:10px 8px;cursor:pointer;color:var(--ink-soft);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;font-family:var(--font-b);background:none;border-left:none;border-right:none;border-top:none}
+.tnav.active{color:var(--rose-dark);border-bottom-color:var(--rose);font-weight:500}
+
+.readings-tabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.rtab{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--parchment);background:white;color:var(--ink-mid);cursor:pointer;transition:all .15s;font-family:var(--font-b)}
+.rtab.active{background:var(--rose-light);border-color:var(--rose);color:var(--rose-dark);font-weight:500}
+
+.reading-card{background:white;border:1px solid var(--parchment);border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1.5rem}
+.reading-label-pill{display:inline-block;font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--rose-dark);background:var(--rose-pale);border:1px solid var(--rose-light);border-radius:20px;padding:3px 12px;margin-bottom:.5rem}
+.reading-ref{font-family:var(--font-d);font-size:15px;font-style:italic;color:var(--ink-mid);margin-bottom:.75rem}
+.reading-text{font-family:var(--font-d);font-size:16px;line-height:1.85;color:var(--ink)}
+
+.loading-block{text-align:center;padding:2rem;color:var(--ink-soft)}
+.spinner{display:inline-block;width:24px;height:24px;border:2px solid var(--parchment);border-top-color:var(--rose);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:.75rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.divider{height:1px;background:var(--parchment);margin:1.5rem 0;position:relative}
+.divider::after{content:'✦';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--cream);padding:0 10px;color:var(--rose);font-size:12px}
+
+.step{margin-bottom:1.75rem}
+.step-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:1rem}
+.step-icon-wrap{width:42px;height:42px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:18px;font-weight:600}
+.step-eyebrow{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+.step-name{font-family:var(--font-d);font-size:20px;font-weight:500;color:var(--ink);line-height:1.1}
+.step-desc{font-size:13px;color:var(--ink-mid);line-height:1.6;margin-top:3px}
+
+.s1 .step-icon-wrap{background:var(--rose-pale);color:var(--rose-dark)}.s1 .step-eyebrow{color:var(--rose-dark)}
+.s2 .step-icon-wrap{background:var(--lavender-light);color:var(--lavender)}.s2 .step-eyebrow{color:var(--lavender)}
+.s3 .step-icon-wrap{background:var(--amber-light);color:var(--amber)}.s3 .step-eyebrow{color:var(--amber)}
+.s4 .step-icon-wrap{background:var(--sage-light);color:var(--sage)}.s4 .step-eyebrow{color:var(--sage)}
+.s5 .step-icon-wrap{background:var(--gold-light);color:var(--gold)}.s5 .step-eyebrow{color:var(--gold)}
+
+.write-field{width:100%;background:white;border:1px solid var(--parchment);border-radius:10px;padding:12px 16px;font-family:var(--font-d);font-size:16px;color:var(--ink);line-height:1.7;resize:none;outline:none;transition:border-color .2s;min-height:90px}
+.write-field:focus{border-color:var(--rose)}
+.write-field::placeholder{color:var(--ink-soft);font-style:italic}
+.write-field-single{min-height:unset;height:48px;resize:none;overflow:hidden}
+
+.timer-row{display:flex;align-items:center;gap:12px;margin-top:10px}
+.timer-display{font-family:var(--font-d);font-size:28px;font-weight:500;color:var(--sage);min-width:70px}
+.timer-btn{background:var(--sage-light);border:1px solid #B8D4C0;color:var(--sage);border-radius:8px;padding:6px 16px;font-size:13px;cursor:pointer;font-family:var(--font-b);transition:background .15s}
+.timer-btn:hover{background:#D0E8D8}
+.timer-label{font-size:12px;color:var(--ink-soft)}
+
+.save-area{margin:1.5rem 0 2rem;display:flex;align-items:center;gap:14px}
+.btn-save{background:var(--rose-dark);border:none;color:white;border-radius:10px;padding:12px 28px;font-size:14px;font-family:var(--font-b);cursor:pointer;transition:background .2s}
+.btn-save:hover{background:#7A4040}
+.saved-msg{font-family:var(--font-d);font-size:15px;font-style:italic;color:var(--sage);opacity:0;transition:opacity .4s}
+.saved-msg.show{opacity:1}
+
+.hist-item{background:white;border:1px solid var(--parchment);border-radius:10px;padding:12px 16px;margin-bottom:8px}
+.hist-date{font-size:11px;color:var(--rose-dark);font-weight:500;margin-bottom:4px}
+.hist-ref{font-family:var(--font-d);font-size:15px;font-style:italic;color:var(--ink);margin-bottom:4px}
+.hist-word{font-size:13px;color:var(--ink-mid)}
+.hist-actio{font-size:13px;color:var(--ink-soft);font-style:italic;margin-top:3px}
+.hist-section{margin-top:10px;border-top:1px solid var(--parchment);padding-top:10px}
+.hist-section-label{font-family:"Outfit",sans-serif;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--rose-dark);margin-bottom:4px}
+.hist-section-text{font-family:var(--font-d);font-size:15px;color:var(--ink);line-height:1.7}
+.hist-toggle{font-family:"Outfit",sans-serif;font-size:11px;color:var(--rose-dark);cursor:pointer;margin-top:8px;display:inline-block;font-weight:500;letter-spacing:.04em;background:none;border:none;padding:0}
+.hist-toggle:hover{color:var(--rose)}
+.hist-full{display:none;margin-top:6px}
+.hist-full.open{display:block}
+.empty-state{text-align:center;padding:2.5rem 1rem;color:var(--ink-soft);font-family:var(--font-d);font-size:16px;font-style:italic}
+
+.error-block{background:#FAF0F0;border:1px solid var(--rose-light);border-radius:10px;padding:14px 18px;font-size:13px;color:var(--rose-dark);margin-bottom:1rem;line-height:1.6}
+.error-block a{color:var(--rose-dark);font-weight:500}
+
+.creator-bar{background:var(--ink);padding:.6rem 1.5rem;display:flex;align-items:center;justify-content:center;gap:8px}
+.creator-bar-text{font-size:11px;color:var(--ink-soft);letter-spacing:.04em}
+.creator-bar-handle{font-size:12px;color:var(--gold);font-weight:500;letter-spacing:.04em;text-decoration:none}
+.creator-bar-handle:hover{color:var(--rose-light)}
+
+.saint-card{background:white;border:1px solid var(--parchment);border-left:3px solid var(--rose);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.saint-card::before{content:'\201C';font-family:var(--font-d);font-size:64px;color:var(--rose-light);position:absolute;top:-8px;left:10px;line-height:1;pointer-events:none}
+.saint-quote{font-family:"Outfit",sans-serif;font-size:15px;font-style:normal;font-weight:400;color:var(--ink);line-height:1.7;padding-left:1.5rem;position:relative;z-index:1}
+.saint-name{font-family:"Outfit",sans-serif;font-size:11px;font-weight:600;color:var(--rose-dark);letter-spacing:.1em;text-transform:uppercase;margin-top:.5rem;padding-left:1.5rem}
+
+.page-footer{text-align:center;padding:2rem 1.5rem 1rem;font-size:11px;color:var(--ink-soft);line-height:1.7}
+.page-footer a{color:var(--rose);text-decoration:none}
+
+@media(max-width:480px){
+  .streak-label{font-size:9px}.streak-num{font-size:18px}
+  .page-header{padding:2rem 1rem 1.5rem}.main{padding:1.25rem 1rem 0}
+  .feast-text{max-width:55%}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="page-header-eyebrow">Oração contemplativa</div>
+  <h1>Lectio <em>Divina</em></h1>
+  <p class="page-header-sub">A liturgia do dia — lida, meditada e orada</p>
+</header>
+
+<div class="creator-bar">
+  <span class="creator-bar-text">uma iniciativa de</span>
+  <a class="creator-bar-handle" href="https://instagram.com/_lariifreitaas" target="_blank" rel="noopener">@_lariifreitaas</a>
+</div>
+
+<div class="date-bar">
+  <div class="date-text">
+    <div class="date-wday" id="date-wday"></div>
+    <div class="date-num" id="date-num"></div>
+    <div class="date-month" id="date-month"></div>
+    <div class="feast-text" id="feast-text"></div>
+  </div>
+</div>
+
+<div class="streak-section">
+  <div class="streak-grid">
+    <div class="streak-item"><div class="streak-num" id="s-streak">0</div><div class="streak-label">dias seguidos</div></div>
+    <div class="streak-item"><div class="streak-num" id="s-total">0</div><div class="streak-label">práticas no mês</div></div>
+    <div class="streak-item"><div class="streak-num" id="s-best">0</div><div class="streak-label">melhor sequência</div></div>
+    <div class="streak-item"><div class="streak-num" id="s-words">0</div><div class="streak-label">palavras guardadas</div></div>
+  </div>
+  <div class="cal-wrap">
+    <div class="cal-title" id="cal-month-title"></div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="tab-nav">
+    <button class="tnav active" onclick="setTab('praticar')">Praticar</button>
+    <button class="tnav" onclick="setTab('historico')">Histórico</button>
+  </div>
+
+  <div id="panel-praticar">
+    <div id="liturgy-area">
+      <div class="loading-block"><div class="spinner"></div><div>Buscando a liturgia de hoje...</div></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="saint-card" id="saint-card">
+      <div class="saint-quote" id="saint-quote"></div>
+      <div class="saint-name" id="saint-name"></div>
+    </div>
+
+    <div class="step s1">
+      <div class="step-head">
+        <div class="step-icon-wrap">I</div>
+        <div class="step-info">
+          <div class="step-eyebrow">1 · Lectio</div>
+          <div class="step-name">Leitura</div>
+          <div class="step-desc">Leia o trecho devagar, deixando as palavras entrarem. Qual versículo te chamou?</div>
+        </div>
+      </div>
+      <textarea class="write-field" id="f-lectio" placeholder="O versículo ou trecho que mais me tocou foi..."></textarea>
+    </div>
+
+    <div class="step s2">
+      <div class="step-head">
+        <div class="step-icon-wrap">II</div>
+        <div class="step-info">
+          <div class="step-eyebrow">2 · Meditatio</div>
+          <div class="step-name">Meditação</div>
+          <div class="step-desc">Qual palavra ou frase ficou em você? Rumina. Não analise — sinta.</div>
+        </div>
+      </div>
+      <textarea class="write-field write-field-single" id="f-word" placeholder="A palavra que ficou comigo foi..."></textarea>
+    </div>
+
+    <div class="step s3">
+      <div class="step-head">
+        <div class="step-icon-wrap">III</div>
+        <div class="step-info">
+          <div class="step-eyebrow">3 · Oratio</div>
+          <div class="step-name">Oração</div>
+          <div class="step-desc">Responda a Deus a partir do que o texto despertou. Escreva como uma carta.</div>
+        </div>
+      </div>
+      <textarea class="write-field" id="f-oratio" placeholder="Senhor, isso me diz que..." style="min-height:110px"></textarea>
+    </div>
+
+    <div class="step s4">
+      <div class="step-head">
+        <div class="step-icon-wrap">IV</div>
+        <div class="step-info">
+          <div class="step-eyebrow">4 · Contemplatio</div>
+          <div class="step-name">Contemplação</div>
+          <div class="step-desc">Fique em silêncio. Só presença. Além das palavras.</div>
+        </div>
+      </div>
+      <div class="timer-row">
+        <div class="timer-display" id="timer-display">5:00</div>
+        <button class="timer-btn" id="timer-btn" onclick="toggleTimer()">Iniciar</button>
+        <div class="timer-label">minutos de silêncio</div>
+      </div>
+      <textarea class="write-field" style="margin-top:12px;min-height:70px" id="f-contemp" placeholder="Depois do silêncio, o que ficou em mim..."></textarea>
+    </div>
+
+    <div class="step s5">
+      <div class="step-head">
+        <div class="step-icon-wrap">V</div>
+        <div class="step-info">
+          <div class="step-eyebrow">5 · Actio</div>
+          <div class="step-name">Ação</div>
+          <div class="step-desc">O que esse encontro me chama a viver hoje?</div>
+        </div>
+      </div>
+      <textarea class="write-field write-field-single" id="f-actio" placeholder="Hoje vou viver isso em..."></textarea>
+    </div>
+
+    <div class="save-area">
+      <button class="btn-save" id="btn-save" onclick="saveDay()">Registrar prática</button>
+      <span class="saved-msg" id="saved-msg">Guardado com carinho ✦</span>
+    </div>
+  </div>
+
+  <div id="panel-historico" style="display:none">
+    <div id="hist-list"></div>
+  </div>
+</div>
+
+<footer class="page-footer">
+  Liturgia: <a href="https://liturgia.cancaonova.com/pb/" target="_blank" rel="noopener">Canção Nova</a><br>
+  Criado por <a href="https://instagram.com/_lariifreitaas" target="_blank" rel="noopener">@_lariifreitaas</a><br>
+  Suas anotações ficam salvas neste dispositivo.
+</footer>
+
+<script>
+const MONTHS_PT=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const MONTHS_FULL=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const WDAYS_PT=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+const DOW=['D','S','T','Q','Q','S','S'];
+
+let liturgy=null;
+let activeReadingIdx=0;
+let timerInterval=null,timerSeconds=300,timerRunning=false;
+
+function todayKey(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function getStore(){try{return JSON.parse(localStorage.getItem('ld_pub2')||'{}')}catch{return{}}}
+function setStore(d){try{localStorage.setItem('ld_pub2',JSON.stringify(d))}catch{}}
+
+function calcStreak(){
+  const s=getStore();let n=0,d=new Date();
+  for(let i=0;i<90;i++){
+    const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    if(s[k]&&s[k].saved){n++;d.setDate(d.getDate()-1);}else break;
+  }
+  return n;
+}
+function calcBest(){
+  const s=getStore(),keys=Object.keys(s).filter(k=>s[k]&&s[k].saved).sort();
+  let best=0,cur=0,prev=null;
+  keys.forEach(k=>{
+    if(prev){const diff=(new Date(k)-new Date(prev))/86400000;cur=diff===1?cur+1:1;}else cur=1;
+    if(cur>best)best=cur;prev=k;
+  });
+  return best;
+}
+function calcMonthTotal(){
+  const s=getStore(),now=new Date();
+  const pfx=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  return Object.keys(s).filter(k=>k.startsWith(pfx)&&s[k]&&s[k].saved).length;
+}
+function calcWords(){
+  return Object.values(getStore()).filter(v=>v&&v.word&&v.word.trim()).length;
+}
+
+function updateStats(){
+  document.getElementById('s-streak').textContent=calcStreak();
+  document.getElementById('s-total').textContent=calcMonthTotal();
+  document.getElementById('s-best').textContent=calcBest();
+  document.getElementById('s-words').textContent=calcWords();
+}
+
+function buildCalendar(){
+  const now=new Date(),s=getStore();
+  const year=now.getFullYear(),month=now.getMonth();
+  const first=new Date(year,month,1).getDay();
+  const days=new Date(year,month+1,0).getDate();
+  const today=now.getDate();
+  document.getElementById('cal-month-title').textContent=MONTHS_FULL[month]+' '+year;
+  let html=DOW.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  for(let i=0;i<first;i++) html+=`<div class="cal-day"></div>`;
+  for(let d=1;d<=days;d++){
+    const k=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const done=s[k]&&s[k].saved,isToday=d===today;
+    html+=`<div class="cal-day${done?' done':''}${isToday?' today':''}">${d}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML=html;
+}
+
+/* ---- PARSE LITURGY FROM HTML ---- */
+function parseLiturgy(html){
+  const parser=new DOMParser();
+  const doc=parser.parseFromString(html,'text/html');
+
+  // feast title
+  const h1=doc.querySelector('h1.entry-title, h1.post-title, h1');
+  const feast=h1?h1.textContent.trim():'';
+
+  const readings=[];
+
+  // Find content container — try multiple selectors used by Canção Nova
+  const content=doc.querySelector(
+    '.entry-content, .post-content, #conteudo, .liturgia-content, article .content, article, main'
+  );
+  if(!content) return null;
+
+  const strongEls=[...content.querySelectorAll('strong, b, h2, h3')];
+
+  // Find reading headers with flexible matching
+  const headers=[];
+  strongEls.forEach(el=>{
+    const t=el.textContent.trim();
+    if(/primeira\s+leitura/i.test(t)&&headers.every(h=>!/primeira/i.test(h.el.textContent)))
+      headers.push({el,label:'1ª Leitura',type:'leitura'});
+    else if(/segunda\s+leitura/i.test(t)&&headers.every(h=>!/segunda/i.test(h.el.textContent)))
+      headers.push({el,label:'2ª Leitura',type:'leitura'});
+    else if((/responsório|salmo\s+responsorial/i.test(t))&&headers.every(h=>!/responsório|salmo/i.test(h.el.textContent)))
+      headers.push({el,label:'Salmo',type:'salmo'});
+    else if(/^salmo\b/i.test(t)&&headers.every(h=>!/salmo/i.test(h.el.textContent)))
+      headers.push({el,label:'Salmo',type:'salmo'});
+    else if(/evangelho\b/i.test(t)&&!/aclamação|aleluia/i.test(t)&&headers.every(h=>!/evangelho/i.test(h.el.textContent)))
+      headers.push({el,label:'Evangelho',type:'evangelho'});
+  });
+
+  headers.forEach((h)=>{
+    const refMatch=h.el.textContent.match(/\(([^)]+)\)/);
+    const ref=refMatch?refMatch[1]:h.el.textContent
+      .replace(/primeira leitura|segunda leitura|responsório|salmo responsorial|salmo|evangelho/gi,'')
+      .replace(/[()]/g,'').trim();
+
+    let textNodes=[];
+    // Walk siblings from the header's paragraph forward
+    let node=h.el.closest('p,div,li')||h.el;
+    let el=node.nextElementSibling||node.parentElement?.nextElementSibling;
+    let limit=0;
+    while(el&&limit<40){
+      limit++;
+      const txt=el.textContent||'';
+      // Stop at next reading heading
+      if(/\b(primeira|segunda)\s+leitura\b|^\s*(responsório|salmo\s+responsorial|salmo)\b|^\s*evangelho\b/i.test(txt)&&
+         el.querySelector('strong,b,h2,h3')) break;
+      if(el.tagName==='IFRAME'||el.tagName==='SCRIPT'||
+         el.classList.contains('sharedaddy')||el.classList.contains('wpcnt')) {
+        el=el.nextElementSibling;continue;
+      }
+      // Stop at liturgical closing formulas
+      if(/palavra do senhor|palavra da salvação|glória a vós/i.test(txt)){
+        const filtered=txt.split('\n').filter(l=>!/palavra do senhor|palavra da salvação|glória a vós/i.test(l)).join('\n');
+        if(filtered.trim()) textNodes.push(filtered.trim());
+        break;
+      }
+      if(txt.trim()) textNodes.push(txt.trim());
+      el=el.nextElementSibling;
+    }
+
+    const text=textNodes
+      .join('\n')
+      .replace(/^\d+\s*/gm,'')
+      .replace(/\*\*/g,'')
+      .replace(/\n{3,}/g,'\n\n')
+      .trim();
+
+    if(text.length>30){
+      readings.push({label:h.label,ref,text});
+    }
+  });
+
+  return readings.length?{feast,readings}:null;
+}
+
+/* ---- FETCH LITURGY via Claude AI ---- */
+async function fetchLiturgy(){
+  const now=new Date();
+  const dia=String(now.getDate()).padStart(2,'0');
+  const mes=String(now.getMonth()+1).padStart(2,'0');
+  const ano=now.getFullYear();
+  const cacheKey=`liturgia_cache_${ano}-${mes}-${dia}`;
+
+  // Cache: reusa se já carregou hoje
+  try{
+    const cached=localStorage.getItem(cacheKey);
+    if(cached){const p=JSON.parse(cached);if(p&&p.readings&&p.readings.length) return p;}
+  }catch(_){}
+
+  const dataStr=`${dia}/${mes}/${ano}`;
+  const prompt=`Você é um assistente católico. Forneça a liturgia católica romana completa do dia ${dataStr} (Brasil), baseada no Lecionário oficial da CNBB.
+
+Responda APENAS com JSON válido, sem markdown, sem explicações, neste formato exato:
+{
+  "feast": "Nome da celebração/festa do dia",
+  "readings": [
+    {"label": "1ª Leitura", "ref": "referência bíblica ex: At 1,1-11", "text": "texto completo da leitura"},
+    {"label": "Salmo", "ref": "referência ex: Sl 46", "text": "texto do salmo responsorial com refrão"},
+    {"label": "2ª Leitura", "ref": "referência", "text": "texto (somente se houver)"},
+    {"label": "Evangelho", "ref": "referência ex: Lc 24,46-53", "text": "texto completo do evangelho"}
+  ]
+}
+Inclua apenas as leituras que existem para esse dia. Omita a 2ª Leitura se não houver (dias feriais). Os textos devem ser completos e fiéis ao Lecionário da CNBB.`;
+
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:2000,
+      tools:[{type:'web_search_20250305',name:'web_search'}],
+      messages:[{role:'user',content:prompt}]
+    })
+  });
+
+  if(!resp.ok) throw new Error('Falha na API');
+  const data=await resp.json();
+
+  // Extrai o texto da resposta (pode ter múltiplos blocos por causa do web_search)
+  const text=data.content
+    .filter(b=>b.type==='text')
+    .map(b=>b.text)
+    .join('');
+
+  // Parse JSON — limpa possíveis marcadores markdown
+  const clean=text.replace(/```json|```/g,'').trim();
+  // Encontra o objeto JSON na resposta
+  const match=clean.match(/\{[\s\S]*\}/);
+  if(!match) throw new Error('JSON não encontrado na resposta');
+  const parsed=JSON.parse(match[0]);
+
+  if(!parsed.readings||!parsed.readings.length) throw new Error('Leituras não encontradas');
+
+  // Salva cache
+  try{localStorage.setItem(cacheKey,JSON.stringify(parsed));}catch(_){}
+  return parsed;
+}
+
+/* ---- RENDER READINGS ---- */
+function renderReadings(){
+  if(!liturgy||!liturgy.readings||!liturgy.readings.length) return;
+  const tabs=liturgy.readings.map((r,i)=>`<button class="rtab${i===activeReadingIdx?' active':''}" onclick="setReading(${i})">${sanitize(r.label)}</button>`).join('');
+  const r=liturgy.readings[activeReadingIdx];
+  document.getElementById('liturgy-area').innerHTML=`
+    <div class="readings-tabs">${tabs}</div>
+    <div class="reading-card">
+      <div class="reading-label-pill">${sanitize(r.label)}</div>
+      <div class="reading-ref">${sanitize(r.ref)}</div>
+      <div class="reading-text">${sanitize(r.text).replace(/\n/g,'<br>')}</div>
+    </div>`;
+}
+
+function setReading(i){activeReadingIdx=i;renderReadings();}
+
+function setTab(t){
+  document.querySelectorAll('.tnav').forEach((b,i)=>{
+    b.classList.toggle('active',['praticar','historico'][i]===t);
+  });
+  document.getElementById('panel-praticar').style.display=t==='praticar'?'block':'none';
+  document.getElementById('panel-historico').style.display=t==='historico'?'block':'none';
+  if(t==='historico') buildHistory();
+}
+
+function toggleHist(id){
+  const el=document.getElementById('hf-'+id);
+  const btn=document.getElementById('hb-'+id);
+  if(!el) return;
+  el.classList.toggle('open');
+  btn.textContent=el.classList.contains('open')?'ver menos ▲':'ver tudo ▼';
+}
+function buildHistory(){
+  const s=getStore();
+  const entries=Object.entries(s).filter(([,v])=>v&&v.saved).sort((a,b)=>b[0].localeCompare(a[0]));
+  if(!entries.length){
+    document.getElementById('hist-list').innerHTML='<div class="empty-state">Nenhuma prática registrada ainda.<br>Comece hoje.</div>';
+    return;
+  }
+  document.getElementById('hist-list').innerHTML=entries.map(([k,v],i)=>{
+    const[y,m,d]=k.split('-');
+    const hasMore=v.lectio||v.oratio||v.contemp;
+    return `<div class="hist-item">
+      <div class="hist-date">${d}/${m}/${y}</div>
+      ${v.reading_ref?`<div class="hist-ref">${v.reading_ref}</div>`:''}
+      ${v.word?`<div class="hist-word">✦ ${v.word}</div>`:''}
+      ${v.actio?`<div class="hist-actio">${v.actio}</div>`:''}
+      ${hasMore?`
+        <button class="hist-toggle" id="hb-${i}" onclick="toggleHist(${i})">ver tudo ▼</button>
+        <div class="hist-full" id="hf-${i}">
+          ${v.lectio?`<div class="hist-section"><div class="hist-section-label">Lectio</div><div class="hist-section-text">${v.lectio}</div></div>`:''}
+          ${v.oratio?`<div class="hist-section"><div class="hist-section-label">Oratio</div><div class="hist-section-text">${v.oratio}</div></div>`:''}
+          ${v.contemp?`<div class="hist-section"><div class="hist-section-label">Contemplatio</div><div class="hist-section-text">${v.contemp}</div></div>`:''}
+        </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function saveDay(){
+  const s=getStore(),key=todayKey();
+  const ref=liturgy&&liturgy.readings?liturgy.readings[activeReadingIdx].ref:'';
+  s[key]={
+    saved:true,reading_ref:ref,
+    lectio:document.getElementById('f-lectio').value,
+    word:document.getElementById('f-word').value,
+    oratio:document.getElementById('f-oratio').value,
+    contemp:document.getElementById('f-contemp').value,
+    actio:document.getElementById('f-actio').value,
+    ts:Date.now()
+  };
+  setStore(s);
+  updateStats();buildCalendar();
+  document.getElementById('btn-save').textContent='Atualizar prática';
+  const msg=document.getElementById('saved-msg');
+  msg.classList.add('show');setTimeout(()=>msg.classList.remove('show'),3000);
+}
+
+function restoreToday(){
+  const s=getStore(),today=s[todayKey()]||{};
+  if(today.lectio) document.getElementById('f-lectio').value=today.lectio;
+  if(today.word) document.getElementById('f-word').value=today.word;
+  if(today.oratio) document.getElementById('f-oratio').value=today.oratio;
+  if(today.contemp) document.getElementById('f-contemp').value=today.contemp;
+  if(today.actio) document.getElementById('f-actio').value=today.actio;
+  if(today.saved) document.getElementById('btn-save').textContent='Atualizar prática';
+}
+
+function updateTimerDisplay(){
+  const m=Math.floor(timerSeconds/60),s=timerSeconds%60;
+  document.getElementById('timer-display').textContent=m+':'+(s<10?'0':'')+s;
+}
+function toggleTimer(){
+  if(timerRunning){
+    clearInterval(timerInterval);timerRunning=false;
+    document.getElementById('timer-btn').textContent='Continuar';
+  } else {
+    if(timerSeconds===0){timerSeconds=300;updateTimerDisplay();}
+    timerRunning=true;
+    document.getElementById('timer-btn').textContent='Pausar';
+    timerInterval=setInterval(()=>{
+      timerSeconds--;updateTimerDisplay();
+      if(timerSeconds<=0){
+        clearInterval(timerInterval);timerRunning=false;
+        document.getElementById('timer-btn').textContent='Reiniciar';
+      }
+    },1000);
+  }
+}
+
+const SAINTS=[
+  {quote:"A oração é a respiração da alma. Quem não ora, sufoca espiritualmente.",name:"Santo Agostinho"},
+  {quote:"Não te preocupes com o amanhã. Ocupa-te bem do momento presente, e Deus proverá ao resto.",name:"Santa Teresa do Menino Jesus"},
+  {quote:"A perseverança é a virtude pela qual todas as outras virtudes produzem seu fruto.",name:"São Tomás de Aquino"},
+  {quote:"A Palavra de Deus é viva e eficaz. Deixa que ela te transforme, não apenas te informe.",name:"São Jerônimo"},
+  {quote:"Quem reza muito não peca muito, e quem peca pouco não tardará a chegar à perfeição.",name:"São Afonso de Ligório"},
+  {quote:"Há flores em cada campo e frutos em cada estação. Busca a Deus onde quer que estejas.",name:"São Francisco de Sales"},
+  {quote:"Uma hora de meditação vale mais do que mil anos de vida mundana.",name:"São João da Cruz"},
+  {quote:"Não temas — onde estás, Deus está. E onde Deus está, nada falta.",name:"Santa Teresa d'Ávila"},
+  {quote:"Amar a Deus com todo o coração é a única riqueza que não se perde.",name:"São João Crisóstomo"},
+  {quote:"Se soubesses o presente que Deus te faz ao dar-te um tempo de oração, não o desperdiçarias.",name:"Santo Cura d'Ars"},
+  {quote:"A constância na oração é o sinal mais seguro de que Deus te habita.",name:"São Bernardo de Claraval"},
+  {quote:"Não existe distância entre quem ora com o coração e o coração de Deus.",name:"Santa Faustina Kowalska"},
+];
+
+function showSaint(){
+  // Pick based on day of year so muda todo dia mas é igual pra todos
+  const d=new Date();
+  const doy=Math.floor((d-new Date(d.getFullYear(),0,0))/86400000);
+  const s=SAINTS[doy%SAINTS.length];
+  const qEl=document.getElementById('saint-quote');
+  const nEl=document.getElementById('saint-name');
+  if(qEl) qEl.textContent=s.quote;
+  if(nEl) nEl.textContent='— '+s.name;
+}
+
+async function init(){
+  const now=new Date();
+  document.getElementById('date-wday').textContent=WDAYS_PT[now.getDay()];
+  document.getElementById('date-num').textContent=String(now.getDate()).padStart(2,'0');
+  document.getElementById('date-month').textContent=MONTHS_PT[now.getMonth()]+' · '+now.getFullYear();
+  updateStats();buildCalendar();restoreToday();restoreDraft();attachDraftListeners();showSaint();
+
+  try{
+    liturgy=await fetchLiturgy();
+    if(liturgy&&liturgy.feast) document.getElementById('feast-text').textContent=liturgy.feast;
+    renderReadings();
+  } catch(e){
+    console.error(e);
+    document.getElementById('liturgy-area').innerHTML=`
+      <div class="error-block">
+        Não foi possível carregar a liturgia automaticamente.<br>
+        <button onclick="retryLiturgy()" style="margin-top:8px;background:var(--rose-dark);color:white;border:none;border-radius:8px;padding:7px 18px;font-size:13px;cursor:pointer;font-family:var(--font-b)">↺ Tentar novamente</button>
+        <br><br>Ou acesse diretamente: <a href="https://liturgia.cancaonova.com/pb/" target="_blank" rel="noopener">liturgia.cancaonova.com</a>
+      </div>`;
+  }
+}
+
+/* ---- SEGURANÇA: sanitização XSS ---- */
+function sanitize(str){
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;');
+}
+
+/* ---- PERFORMANCE: debounce para salvar rascunho ---- */
+function debounce(fn,delay){
+  let t;
+  return function(...args){clearTimeout(t);t=setTimeout(()=>fn.apply(this,args),delay);};
+}
+
+const autosaveDraft=debounce(()=>{
+  try{
+    const draft={
+      lectio:document.getElementById('f-lectio')?.value||'',
+      word:document.getElementById('f-word')?.value||'',
+      oratio:document.getElementById('f-oratio')?.value||'',
+      contemp:document.getElementById('f-contemp')?.value||'',
+      actio:document.getElementById('f-actio')?.value||'',
+    };
+    sessionStorage.setItem('lectio_draft',JSON.stringify(draft));
+  }catch(_){}
+},800);
+
+function attachDraftListeners(){
+  ['f-lectio','f-word','f-oratio','f-contemp','f-actio'].forEach(id=>{
+    document.getElementById(id)?.addEventListener('input',autosaveDraft);
+  });
+}
+
+function restoreDraft(){
+  try{
+    const raw=sessionStorage.getItem('lectio_draft');
+    if(!raw) return;
+    const draft=JSON.parse(raw);
+    Object.entries(draft).forEach(([key,val])=>{
+      const el=document.getElementById('f-'+key);
+      if(el&&!el.value&&val) el.value=val;
+    });
+  }catch(_){}
+}
+
+async function retryLiturgy(){
+  document.getElementById('liturgy-area').innerHTML=`<div class="loading-block"><div class="spinner"></div><div>Buscando a liturgia de hoje...</div></div>`;
+  try{
+    liturgy=await fetchLiturgy();
+    if(liturgy&&liturgy.feast) document.getElementById('feast-text').textContent=liturgy.feast;
+    renderReadings();
+  }catch(e){
+    console.error(e);
+    document.getElementById('liturgy-area').innerHTML=`
+      <div class="error-block">
+        Ainda não foi possível carregar. Tente mais tarde ou acesse: <a href="https://liturgia.cancaonova.com/pb/" target="_blank" rel="noopener">liturgia.cancaonova.com</a>
+        <br><button onclick="retryLiturgy()" style="margin-top:8px;background:var(--rose-dark);color:white;border:none;border-radius:8px;padding:7px 18px;font-size:13px;cursor:pointer;font-family:var(--font-b)">↺ Tentar novamente</button>
+      </div>`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
